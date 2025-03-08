@@ -43,9 +43,8 @@ function encodeRTL(
   digits: Digit[],
   letters: UppercaseLetter[]
 ): [Digit[], UppercaseLetter[]] {
-  let multiplicator = 10 ** -prefixCount;
   let overflowBoundary = 10 ** prefixCount;
-  if (input <= overflowBoundary -1) {
+  if (input <= overflowBoundary - 1) {
     let base10results = input
       .toString()
       .padStart(prefixCount, "0")
@@ -54,13 +53,30 @@ function encodeRTL(
     return [base10results, letters];
   }
   let remainder = input % overflowBoundary;
-  let postfixOverflow = Math.round(input * multiplicator);
+  let postfixOverflow = Math.floor(input / overflowBoundary);
   let prevLettersLength = letters.length;
-  letters = incrementBase26Results(letters, postfixOverflow)
-  return encodeRTL(remainder, prefixCount - letters.length + prevLettersLength, digits, letters);
+  if (prefixCount === 6) {
+    letters = incrementBase26Results(letters, 1);
+    return encodeRTL(
+      remainder + (postfixOverflow - 1) * overflowBoundary,
+      prefixCount - letters.length + prevLettersLength,
+      digits,
+      letters
+    );
+  }
+  letters = incrementBase26Results(letters, postfixOverflow);
+  return encodeRTL(
+    remainder,
+    prefixCount - letters.length + prevLettersLength,
+    digits,
+    letters
+  );
 }
 
-function incrementBase26Results(input: UppercaseLetter[], increment: number): UppercaseLetter[] {
+function incrementBase26Results(
+  input: UppercaseLetter[],
+  increment: number
+): UppercaseLetter[] {
   let i = input.length - 1;
   if (input.length === 0) {
     let base26results = (9).toString(36).toUpperCase() as UppercaseLetter;
@@ -77,8 +93,8 @@ function incrementBase26Results(input: UppercaseLetter[], increment: number): Up
       result.push(
         (base26representation + 9).toString(36).toUpperCase() as UppercaseLetter
       );
-      i += 1
-      continue
+      i += 1;
+      continue;
     }
     result.push(
       (base26representation + 9).toString(36).toUpperCase() as UppercaseLetter
@@ -88,9 +104,19 @@ function incrementBase26Results(input: UppercaseLetter[], increment: number): Up
   return result;
 }
 
+const LICENSE_PLATE_MAX_INT =
+  10 ** 6 +
+  10 ** 5 * 26 +
+  10 ** 4 * 26 +
+  10 ** 3 * 26 +
+  10 ** 2 * 26 +
+  10 ** 1 * 26;
 export function encodeLicensePlateAsTuple(n: number): PossiblePlateSymbols[] {
   //LicensePlateTuple {
-  const result: PossiblePlateSymbols[] = encodeRTL(n, 6, [], []).flat()
+  if (n > LICENSE_PLATE_MAX_INT) {
+    throw new Error("input value exceeds possible range");
+  }
+  const result: PossiblePlateSymbols[] = encodeRTL(n, 6, [], []).flat();
   return result;
 }
 

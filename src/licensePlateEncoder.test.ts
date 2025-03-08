@@ -36,9 +36,33 @@ describe("encodeRTL", () => {
     expect(actual).toBe("00000B");
   });
 
-  test("Should handle second value after second overflowing digit", () => {
-    const input = 10 ** 6 + 10 ** 5 +2;
+  test("Should handle third value after second overflowing digit", () => {
+    const input = 10 ** 6 + 10 ** 5 + 3;
     const actual = encodeLicensePlate(input);
-    expect(actual).toBe("00002B");
+    expect(actual).toBe("00003B");
+  });
+
+  test("Should handle fourth value after third overflowing digit", () => {
+    const input = 10 ** 6 + 10 ** 5 * 2 + 4;
+    const actual = encodeLicensePlate(input);
+    expect(actual).toBe("00004C");
+  });
+
+  test("Should handle value before 10th overflowing digit", () => {
+    const input = 10 ** 6 + 10 ** 5 * 10 - 1;
+    //this one
+    const actual = encodeLicensePlate(input);
+    expect(actual).toBe("99999J");
+  });
+  test("Should handle fourth value after 10th overflowing digit", () => {
+    const input = 10 ** 6 + 10 ** 5 * 10 + 4;
+    const actual = encodeLicensePlate(input);
+    expect(actual).toBe("00004K");
+  });
+  test("Should handle fourth value after 11th overflowing digit", () => {
+    const input = 10 ** 6 + 10 ** 5 * 11 + 4;
+
+    const actual = encodeLicensePlate(input);
+    expect(actual).toBe("00004L");
   });
 });
