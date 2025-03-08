@@ -23,4 +23,22 @@ describe("encodeRTL", () => {
     const actual = encodeLicensePlate(input);
     expect(actual).toBe("00002A");
   });
+
+  test("Should handle value before second overflowing digit", () => {
+    const input = 10 ** 6 + 10 ** 5 - 1;
+    const actual = encodeLicensePlate(input);
+    expect(actual).toBe("99999A");
+  });
+
+  test("Should handle second overflowing digit", () => {
+    const input = 10 ** 6 + 10 ** 5;
+    const actual = encodeLicensePlate(input);
+    expect(actual).toBe("00000B");
+  });
+
+  test("Should handle second value after second overflowing digit", () => {
+    const input = 10 ** 6 + 10 ** 5 +2;
+    const actual = encodeLicensePlate(input);
+    expect(actual).toBe("00002B");
+  });
 });

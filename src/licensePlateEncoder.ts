@@ -40,29 +40,57 @@ export type LicensePlateTuple = [
 function encodeRTL(
   input: number = 0,
   prefixCount: number = 6,
-  resultSymbols: PossiblePlateSymbols[]
-): [number, PossiblePlateSymbols[]] {
+  digits: Digit[],
+  letters: UppercaseLetter[]
+): [Digit[], UppercaseLetter[]] {
   let multiplicator = 10 ** -prefixCount;
   let overflowBoundary = 10 ** prefixCount;
-  if (input < overflowBoundary) {
+  if (input <= overflowBoundary -1) {
     let base10results = input
       .toString()
       .padStart(prefixCount, "0")
-      .split("") as PossiblePlateSymbols[];
-    //recursive end condition, concatenating minor RTL base10 and major RTL base36 results
-    resultSymbols = [...base10results, ...resultSymbols]
-    return [0, resultSymbols];
+      .split("") as Digit[];
+    //recursive end condition
+    return [base10results, letters];
   }
   let remainder = input % overflowBoundary;
-  let postfixOverflow = Math.floor(input * multiplicator);
-  let base36results = (postfixOverflow + 9).toString(36).toUpperCase() as PossiblePlateSymbols;
-  resultSymbols = [...resultSymbols, base36results]
-  return encodeRTL(remainder, prefixCount - 1, resultSymbols);
+  let postfixOverflow = Math.round(input * multiplicator);
+  let prevLettersLength = letters.length;
+  letters = incrementBase26Results(letters, postfixOverflow)
+  return encodeRTL(remainder, prefixCount - letters.length + prevLettersLength, digits, letters);
+}
+
+function incrementBase26Results(input: UppercaseLetter[], increment: number): UppercaseLetter[] {
+  let i = input.length - 1;
+  if (input.length === 0) {
+    let base26results = (9).toString(36).toUpperCase() as UppercaseLetter;
+    input = [base26results];
+    i = 0;
+  }
+  let result: UppercaseLetter[] = [];
+  while (i >= 0) {
+    let base26representation = parseInt(input[i], 36) - 9;
+    base26representation += increment;
+    if (base26representation > 25) {
+      increment = base26representation - 26;
+      base26representation = 25;
+      result.push(
+        (base26representation + 9).toString(36).toUpperCase() as UppercaseLetter
+      );
+      i += 1
+      continue
+    }
+    result.push(
+      (base26representation + 9).toString(36).toUpperCase() as UppercaseLetter
+    );
+    i -= 1;
+  }
+  return result;
 }
 
 export function encodeLicensePlateAsTuple(n: number): PossiblePlateSymbols[] {
   //LicensePlateTuple {
-  const result = encodeRTL(n, 6, [])[1];
+  const result: PossiblePlateSymbols[] = encodeRTL(n, 6, [], []).flat()
   return result;
 }
 
