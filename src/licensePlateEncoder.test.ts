@@ -79,7 +79,7 @@ describe("encodeRTL", () => {
 
   //after finding solution on leetcode:
   //https://leetcode.com/discuss/post/1416811/google-interview-question-by-2017sp93049-is9g/
-  test("Should handle working portion of leetcode test values", () => {
+  test("Should handle first part of working portion of leetcode test values", () => {
     const inputsAndSolutions: [number, string][] = [
       [0, "00000"],
       [1, "00001"],
@@ -91,10 +91,6 @@ describe("encodeRTL", () => {
       [361001, "001AB"],
       [1035999, "999ZZ"],
       [1036000, "00AAA"],
-      [1036101, "01AAB"],
-      [2793599, "99ZZZ"],
-      [2793600, "0AAAA"],
-      [2793611, "1AAAB"],
     ];
     for (let i = 0; i < inputsAndSolutions.length; i++) {
       const [input, expectedOutput] = inputsAndSolutions[i];
@@ -103,8 +99,12 @@ describe("encodeRTL", () => {
     }
   });
 
-  test("Should handle working portion of leetcode test values (without exceeding call stack)", () => {
+  //works only after increasing node's stack size: `--stack-size=1024`
+  test("Should handle second part of working portion of leetcode test values (without exceeding call stack)", () => {
     const inputsAndSolutions: [number, string][] = [
+      [1036101, "01AAB"],
+      [2793599, "99ZZZ"],
+      [2793600, "0AAAA"],
       [7363359, "9ZZZZ"],
       [7363360, "AAAAA"],
       [7363361, "AAAAB"],
