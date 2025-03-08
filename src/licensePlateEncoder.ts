@@ -41,7 +41,8 @@ function encodeRTL(
   input: number = 0,
   prefixCount: number = 6,
   digits: Digit[],
-  letters: UppercaseLetter[]
+  letters: UppercaseLetter[],
+  licensePlateLength: number
 ): [Digit[], UppercaseLetter[]] {
   let overflowBoundary = 10 ** prefixCount;
   if (input <= overflowBoundary - 1) {
@@ -55,13 +56,14 @@ function encodeRTL(
   let remainder = input % overflowBoundary;
   let postfixOverflow = Math.floor(input / overflowBoundary);
   let prevLettersLength = letters.length;
-  if (input >= 10 ** 6) {
+  if (input >= 10 ** licensePlateLength) {
     letters = incrementBase26Results(letters, 1);
     return encodeRTL(
       remainder + (postfixOverflow - 1) * overflowBoundary,
       prefixCount - letters.length + prevLettersLength,
       digits,
-      letters
+      letters,
+      licensePlateLength
     );
   }
   letters = incrementBase26Results(letters, postfixOverflow);
@@ -69,7 +71,8 @@ function encodeRTL(
     remainder,
     prefixCount - letters.length + prevLettersLength,
     digits,
-    letters
+    letters,
+    licensePlateLength
   );
 }
 
@@ -97,22 +100,37 @@ function incrementBase26Results(
   return base26results;
 }
 
-const LICENSE_PLATE_MAX_INT = getBase26Value("ZZZZZZ") + 999999
-  /*10 ** 6 +
+const LICENSE_PLATE_MAX_INT = getBase26Value("ZZZZZZ") + 999999;
+/*
+  //my initial assumption:
+  LICENSE_PLATE_MAX_INT =
+  10 ** 6 +
   10 ** 5 * 26 +
   10 ** 4 * 26 +
   10 ** 3 * 26 +
   10 ** 2 * 26 +
   10 ** 1 * 26;*/
-export function encodeLicensePlateAsTuple(n: number): PossiblePlateSymbols[] {
+export function encodeLicensePlateAsTuple(
+  n: number,
+  licensePlateLength: number
+): PossiblePlateSymbols[] {
   //LicensePlateTuple {
   if (n > LICENSE_PLATE_MAX_INT) {
     throw new Error("input value exceeds possible range");
   }
-  const result: PossiblePlateSymbols[] = encodeRTL(n, 6, [], []).flat();
+  const result: PossiblePlateSymbols[] = encodeRTL(
+    n,
+    licensePlateLength,
+    [],
+    [],
+    licensePlateLength,
+  ).flat();
   return result;
 }
 
-export function encodeLicensePlate(n: number): string {
-  return encodeLicensePlateAsTuple(n).join("");
+export function encodeLicensePlate(
+  n: number,
+  licensePlateLength: number = 6
+): string {
+  return encodeLicensePlateAsTuple(n, licensePlateLength).join("");
 }
