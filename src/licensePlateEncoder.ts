@@ -55,7 +55,7 @@ function encodeRTL(
   let remainder = input % overflowBoundary;
   let postfixOverflow = Math.floor(input / overflowBoundary);
   let prevLettersLength = letters.length;
-  if (prefixCount === 6) {
+  if (input >= 10 ** 6) {
     letters = incrementBase26Results(letters, 1);
     return encodeRTL(
       remainder + (postfixOverflow - 1) * overflowBoundary,
@@ -73,44 +73,37 @@ function encodeRTL(
   );
 }
 
+// base 26 conversion inspired from here: https://stackoverflow.com/a/50638753
+function getBase26Value(s: string): number {
+  return s.split("").reduce((r, a) => r * 26 + parseInt(a, 36) - 9, 0) - 1;
+}
+
+function setBase26Value(n: number): string {
+  var result = "";
+  do {
+    result = ((n % 26) + 10).toString(36) + result;
+    n = Math.floor(n / 26) - 1;
+  } while (n >= 0);
+  return result.toUpperCase();
+}
+
 function incrementBase26Results(
   input: UppercaseLetter[],
   increment: number
 ): UppercaseLetter[] {
-  let i = input.length - 1;
-  if (input.length === 0) {
-    let base26results = (9).toString(36).toUpperCase() as UppercaseLetter;
-    input = [base26results];
-    i = 0;
-  }
-  let result: UppercaseLetter[] = [];
-  while (i >= 0) {
-    let base26representation = parseInt(input[i], 36) - 9;
-    base26representation += increment;
-    if (base26representation > 25) {
-      increment = base26representation - 26;
-      base26representation = 25;
-      result.push(
-        (base26representation + 9).toString(36).toUpperCase() as UppercaseLetter
-      );
-      i += 1;
-      continue;
-    }
-    result.push(
-      (base26representation + 9).toString(36).toUpperCase() as UppercaseLetter
-    );
-    i -= 1;
-  }
-  return result;
+  let inputAsInt = getBase26Value(input.join(""));
+  inputAsInt += increment;
+  let base26results = setBase26Value(inputAsInt).split("") as UppercaseLetter[];
+  return base26results;
 }
 
-const LICENSE_PLATE_MAX_INT =
-  10 ** 6 +
+const LICENSE_PLATE_MAX_INT = getBase26Value("ZZZZZZ") + 999999
+  /*10 ** 6 +
   10 ** 5 * 26 +
   10 ** 4 * 26 +
   10 ** 3 * 26 +
   10 ** 2 * 26 +
-  10 ** 1 * 26;
+  10 ** 1 * 26;*/
 export function encodeLicensePlateAsTuple(n: number): PossiblePlateSymbols[] {
   //LicensePlateTuple {
   if (n > LICENSE_PLATE_MAX_INT) {

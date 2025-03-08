@@ -65,4 +65,16 @@ describe("encodeRTL", () => {
     const actual = encodeLicensePlate(input);
     expect(actual).toBe("00004L");
   });
+  test("Should handle last value before overflowing numeric", () => {
+    const input = 10 ** 6 + 10 ** 5 * 26 -1;
+    const actual = encodeLicensePlate(input);
+    expect(actual).toBe("99999Z");
+  });
+
+  test("Should handle 3rd value after overflowing numeric", () => {
+    const input = 10 ** 6 + 10 ** 5 * 26 +3;
+    const actual = encodeLicensePlate(input);
+    expect(actual).toBe("0003AA");
+  });
+
 });
