@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --stack-size=1024 node_modules/jest/bin/jest.js "
+    "test": "node node_modules/jest/bin/jest.js ",
+    "largestacktest": "node --stack-size=1024  node_modules/jest/bin/jest.js --runInBand -t encodeRTL"
   },
   "repository": {
     "type": "git",
@@ -18,12 +19,10 @@
   },
   "homepage": "https://github.com/shnydercom/SITA-challenges#readme",
   "devDependencies": {
-    "@types/express": "^4.17.1",
     "@types/jest": "^29.5.14",
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "express": "^4.17.1",
     "ts-jest": "^29.2.6"
   }
 }

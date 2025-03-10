@@ -37,6 +37,6 @@ test("Should fetch larger number of URLs from server", async () => {
   ].map((val) => new URL(val));
   //this one
   const actual = await fetchURLsConcurrently(input);
-	console.log(actual)
+	//console.log(actual)
   expect(actual.length).toBe(input.length);
 });
